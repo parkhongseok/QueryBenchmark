@@ -1,0 +1,872 @@
+Last login: Wed May 28 15:04:03 on ttys010
+(base) keinmall@heulim-ui-MacBookAir ProjectDontGoBack % docker-compose -f docker-compose.dev.yml down -v
+WARN[0000] /Users/keinmall/Documents/ProjectDontGoBack/docker-compose.dev.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
+[+] Running 3/3
+ ✔ Container dev_mariadb                      R...                         0.5s 
+ ✔ Volume projectdontgoback_dev_mariadb_data  Removed                      0.0s 
+ ✔ Network projectdontgoback_default          Removed                      0.2s 
+(base) keinmall@heulim-ui-MacBookAir ProjectDontGoBack % docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+(base) keinmall@heulim-ui-MacBookAir ProjectDontGoBack % docker-compose -f docker-compose.dev.yml up -d
+WARN[0000] /Users/keinmall/Documents/ProjectDontGoBack/docker-compose.dev.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
+[+] Running 3/3
+ ✔ Network projectdontgoback_default            Created                    0.0s 
+ ✔ Volume "projectdontgoback_dev_mariadb_data"  Created                    0.0s 
+ ✔ Container dev_mariadb                        Started                    0.1s 
+(base) keinmall@heulim-ui-MacBookAir ProjectDontGoBack % docker exec -it dev_mariadb mariadb -utestuser -ptestpass testdb 
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 3
+Server version: 11.3.2-MariaDB-1:11.3.2+maria~ubu2204 mariadb.org binary distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [testdb]> show tables;
+Empty set (0.001 sec)
+
+MariaDB [testdb]> SELECT COUNT(1) FROM feeds; SELECT COUNT(1) FROM comment;  SELECT COUNT(1) FROM feed_likes;
++----------+
+| COUNT(1) |
++----------+
+|  1000000 |
++----------+
+1 row in set (0.142 sec)
+
++----------+
+| COUNT(1) |
++----------+
+|    10000 |
++----------+
+1 row in set (0.006 sec)
+
++----------+
+| COUNT(1) |
++----------+
+|    10000 |
++----------+
+1 row in set (0.003 sec)
+
+MariaDB [testdb]> SELECT COUNT(1) AS COUNT_FEEDS FROM feeds; SELECT COUNT(1) AS COUNT_COMMENTS FROM comment;  SELECT COUNT(1) AS FEED_LIKES FROM feed_likes;
++-------------+
+| COUNT_FEEDS |
++-------------+
+|     1000000 |
++-------------+
+1 row in set (0.090 sec)
+
++----------------+
+| COUNT_COMMENTS |
++----------------+
+|          10000 |
++----------------+
+1 row in set (0.001 sec)
+
++------------+
+| FEED_LIKES |
++------------+
+|      10000 |
++------------+
+1 row in set (0.001 sec)
+
+MariaDB [testdb]> SET @lastFeedId := 1000000;
+Query OK, 0 rows affected (0.002 sec)
+
+MariaDB [testdb]> SELECT
+    ->     f.id AS feedId,
+    ->     u.id AS userId,
+    ->     f.content AS content,
+    ->     f.author AS author,
+    ->     f.feed_type AS feedType,
+    ->     (SELECT COUNT(*) FROM feed_likes l WHERE l.feed_id = f.id) AS likeCount,
+    ->     (SELECT COUNT(*) FROM comment c WHERE c.feed_id = f.id AND c.deleted_at IS NULL) AS commentCount,
+    ->     (EXISTS (
+    ->         SELECT 1 FROM feed_likes l
+    ->         WHERE l.feed_id = f.id AND l.user_id = 1
+    ->     )) AS isLiked,
+    ->     f.created_at AS createdAt,
+    ->     f.updated_at AS updatedAt,
+    ->     f.deleted_at AS deletedAt
+    -> FROM feeds f
+    -> JOIN users u ON f.user_id = u.id
+    -> WHERE f.id < @lastFeedId AND f.deleted_at IS NULL
+    -> ORDER BY f.created_at DESC
+    -> LIMIT 10;
++--------+--------+----------------------------+-------------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+| feedId | userId | content                    | author      | feedType | likeCount | commentCount | isLiked | createdAt                  | updatedAt                  | deletedAt |
++--------+--------+----------------------------+-------------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+| 999999 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.956002 | 2025-05-28 17:10:59.956002 | NULL      |
+| 999998 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955875 | 2025-05-28 17:10:59.955875 | NULL      |
+| 999997 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955748 | 2025-05-28 17:10:59.955748 | NULL      |
+| 999996 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955622 | 2025-05-28 17:10:59.955622 | NULL      |
+| 999995 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955489 | 2025-05-28 17:10:59.955489 | NULL      |
+| 999994 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955370 | 2025-05-28 17:10:59.955370 | NULL      |
+| 999993 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955247 | 2025-05-28 17:10:59.955247 | NULL      |
+| 999992 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955119 | 2025-05-28 17:10:59.955119 | NULL      |
+| 999991 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.954998 | 2025-05-28 17:10:59.954998 | NULL      |
+| 999990 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.954841 | 2025-05-28 17:10:59.954841 | NULL      |
++--------+--------+----------------------------+-------------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+10 rows in set (3.345 sec)
+
+MariaDB [testdb]> SET @lastFeedId := 500000; 
+Query OK, 0 rows affected (0.002 sec)
+
+MariaDB [testdb]> SELECT
+    ->     f.id AS feedId,
+    ->     u.id AS userId,
+    ->     f.content AS content,
+    ->     f.author AS author,
+    ->     f.feed_type AS feedType,
+    ->     (SELECT COUNT(*) FROM feed_likes l WHERE l.feed_id = f.id) AS likeCount,
+    ->     (SELECT COUNT(*) FROM comment c WHERE c.feed_id = f.id AND c.deleted_at IS NULL) AS commentCount,
+    ->     (EXISTS (
+    ->         SELECT 1 FROM feed_likes l
+    ->         WHERE l.feed_id = f.id AND l.user_id = 1
+    ->     )) AS isLiked,
+    ->     f.created_at AS createdAt,
+    ->     f.updated_at AS updatedAt,
+    ->     f.deleted_at AS deletedAt
+    -> FROM feeds f
+    -> JOIN users u ON f.user_id = u.id
+    -> WHERE f.id < @lastFeedId AND f.deleted_at IS NULL
+    -> ORDER BY f.created_at DESC
+    -> LIMIT 10;
++--------+--------+----------------------------+-------------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+| feedId | userId | content                    | author      | feedType | likeCount | commentCount | isLiked | createdAt                  | updatedAt                  | deletedAt |
++--------+--------+----------------------------+-------------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+| 499999 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.533557 | 2025-05-28 17:09:35.533557 | NULL      |
+| 499998 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.533392 | 2025-05-28 17:09:35.533392 | NULL      |
+| 499997 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.533176 | 2025-05-28 17:09:35.533176 | NULL      |
+| 499996 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.532954 | 2025-05-28 17:09:35.532954 | NULL      |
+| 499995 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.532801 | 2025-05-28 17:09:35.532801 | NULL      |
+| 499994 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.532615 | 2025-05-28 17:09:35.532615 | NULL      |
+| 499993 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.532436 | 2025-05-28 17:09:35.532436 | NULL      |
+| 499992 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.532240 | 2025-05-28 17:09:35.532240 | NULL      |
+| 499991 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.532033 | 2025-05-28 17:09:35.532033 | NULL      |
+| 499990 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.531818 | 2025-05-28 17:09:35.531818 | NULL      |
++--------+--------+----------------------------+-------------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+10 rows in set (1.694 sec)
+
+MariaDB [testdb]> SET @lastFeedId := 10000;
+Query OK, 0 rows affected (0.002 sec)
+
+MariaDB [testdb]> SELECT
+    ->     f.id AS feedId,
+    ->     u.id AS userId,
+    ->     f.content AS content,
+    ->     f.author AS author,
+    ->     f.feed_type AS feedType,
+    ->     (SELECT COUNT(*) FROM feed_likes l WHERE l.feed_id = f.id) AS likeCount,
+    ->     (SELECT COUNT(*) FROM comment c WHERE c.feed_id = f.id AND c.deleted_at IS NULL) AS commentCount,
+    ->     (EXISTS (
+    ->         SELECT 1 FROM feed_likes l
+    ->         WHERE l.feed_id = f.id AND l.user_id = 1
+    ->     )) AS isLiked,
+    ->     f.created_at AS createdAt,
+    ->     f.updated_at AS updatedAt,
+    ->     f.deleted_at AS deletedAt
+    -> FROM feeds f
+    -> JOIN users u ON f.user_id = u.id
+    -> WHERE f.id < @lastFeedId AND f.deleted_at IS NULL
+    -> ORDER BY f.created_at DESC
+    -> LIMIT 10;
++--------+--------+----------------------------+-----------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+| feedId | userId | content                    | author    | feedType | likeCount | commentCount | isLiked | createdAt                  | updatedAt                  | deletedAt |
++--------+--------+----------------------------+-----------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+|   9999 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         1 |            1 |       0 | 2025-05-28 17:08:11.050675 | 2025-05-28 17:08:11.050675 | NULL      |
+|   9998 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         0 |            0 |       0 | 2025-05-28 17:08:11.050363 | 2025-05-28 17:08:11.050363 | NULL      |
+|   9997 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         1 |            1 |       0 | 2025-05-28 17:08:11.050046 | 2025-05-28 17:08:11.050046 | NULL      |
+|   9996 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         0 |            0 |       0 | 2025-05-28 17:08:11.049768 | 2025-05-28 17:08:11.049768 | NULL      |
+|   9995 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         1 |            1 |       0 | 2025-05-28 17:08:11.049475 | 2025-05-28 17:08:11.049475 | NULL      |
+|   9994 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         0 |            0 |       0 | 2025-05-28 17:08:11.049185 | 2025-05-28 17:08:11.049185 | NULL      |
+|   9993 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         1 |            1 |       0 | 2025-05-28 17:08:11.048884 | 2025-05-28 17:08:11.048884 | NULL      |
+|   9992 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         0 |            0 |       0 | 2025-05-28 17:08:11.048603 | 2025-05-28 17:08:11.048603 | NULL      |
+|   9991 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         1 |            1 |       0 | 2025-05-28 17:08:11.048299 | 2025-05-28 17:08:11.048299 | NULL      |
+|   9990 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         0 |            0 |       0 | 2025-05-28 17:08:11.048024 | 2025-05-28 17:08:11.048024 | NULL      |
++--------+--------+----------------------------+-----------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+10 rows in set (0.031 sec)
+
+MariaDB [testdb]> RESET QUERY CACHE;
+ERROR 1227 (42000): Access denied; you need (at least one of) the RELOAD privilege(s) for this operation
+MariaDB [testdb]> SET @lastFeedId := 1000000;
+Query OK, 0 rows affected (0.009 sec)
+
+MariaDB [testdb]> 
+MariaDB [testdb]> SELECT
+    ->     f.id AS feedId,
+    ->     u.id AS userId,
+    ->     f.content AS content,
+    ->     f.author AS author,
+    ->     f.feed_type AS feedType,
+    ->     (SELECT COUNT(*) FROM feed_likes l WHERE l.feed_id = f.id) AS likeCount,
+    ->     (SELECT COUNT(*) FROM comment c WHERE c.feed_id = f.id AND c.deleted_at IS NULL) AS commentCount,
+    ->     (EXISTS (
+    ->         SELECT 1 FROM feed_likes l
+    ->         WHERE l.feed_id = f.id AND l.user_id = 1
+    ->     )) AS isLiked,
+    ->     f.created_at AS createdAt,
+    ->     f.updated_at AS updatedAt,
+    ->     f.deleted_at AS deletedAt
+    -> FROM feeds f
+    -> JOIN users u ON f.user_id = u.id
+    -> WHERE f.id < @lastFeedId AND f.deleted_at IS NULL
+    -> ORDER BY f.created_at DESC
+    -> LIMIT 10;
++--------+--------+----------------------------+-------------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+| feedId | userId | content                    | author      | feedType | likeCount | commentCount | isLiked | createdAt                  | updatedAt                  | deletedAt |
++--------+--------+----------------------------+-------------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+| 999999 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.956002 | 2025-05-28 17:10:59.956002 | NULL      |
+| 999998 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955875 | 2025-05-28 17:10:59.955875 | NULL      |
+| 999997 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955748 | 2025-05-28 17:10:59.955748 | NULL      |
+| 999996 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955622 | 2025-05-28 17:10:59.955622 | NULL      |
+| 999995 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955489 | 2025-05-28 17:10:59.955489 | NULL      |
+| 999994 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955370 | 2025-05-28 17:10:59.955370 | NULL      |
+| 999993 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955247 | 2025-05-28 17:10:59.955247 | NULL      |
+| 999992 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955119 | 2025-05-28 17:10:59.955119 | NULL      |
+| 999991 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.954998 | 2025-05-28 17:10:59.954998 | NULL      |
+| 999990 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.954841 | 2025-05-28 17:10:59.954841 | NULL      |
++--------+--------+----------------------------+-------------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+10 rows in set (2.950 sec)
+
+MariaDB [testdb]> SET @lastFeedId := 1000000;
+Query OK, 0 rows affected (0.000 sec)
+
+MariaDB [testdb]> 
+MariaDB [testdb]> SELECT
+    ->     f.id AS feedId,
+    ->     u.id AS userId,
+    ->     f.content AS content,
+    ->     f.author AS author,
+    ->     f.feed_type AS feedType,
+    ->     (SELECT COUNT(*) FROM feed_likes l WHERE l.feed_id = f.id) AS likeCount,
+    ->     (SELECT COUNT(*) FROM comment c WHERE c.feed_id = f.id AND c.deleted_at IS NULL) AS commentCount,
+    ->     (EXISTS (
+    ->         SELECT 1 FROM feed_likes l
+    ->         WHERE l.feed_id = f.id AND l.user_id = 1
+    ->     )) AS isLiked,
+    ->     f.created_at AS createdAt,
+    ->     f.updated_at AS updatedAt,
+    ->     f.deleted_at AS deletedAt
+    -> FROM feeds f
+    -> JOIN users u ON f.user_id = u.id
+    -> WHERE f.id < @lastFeedId AND f.deleted_at IS NULL
+    -> ORDER BY f.created_at DESC
+    -> LIMIT 10;
++--------+--------+----------------------------+-------------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+| feedId | userId | content                    | author      | feedType | likeCount | commentCount | isLiked | createdAt                  | updatedAt                  | deletedAt |
++--------+--------+----------------------------+-------------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+| 999999 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.956002 | 2025-05-28 17:10:59.956002 | NULL      |
+| 999998 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955875 | 2025-05-28 17:10:59.955875 | NULL      |
+| 999997 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955748 | 2025-05-28 17:10:59.955748 | NULL      |
+| 999996 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955622 | 2025-05-28 17:10:59.955622 | NULL      |
+| 999995 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955489 | 2025-05-28 17:10:59.955489 | NULL      |
+| 999994 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955370 | 2025-05-28 17:10:59.955370 | NULL      |
+| 999993 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955247 | 2025-05-28 17:10:59.955247 | NULL      |
+| 999992 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955119 | 2025-05-28 17:10:59.955119 | NULL      |
+| 999991 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.954998 | 2025-05-28 17:10:59.954998 | NULL      |
+| 999990 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.954841 | 2025-05-28 17:10:59.954841 | NULL      |
++--------+--------+----------------------------+-------------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+10 rows in set (3.044 sec)
+
+MariaDB [testdb]> 
+MariaDB [testdb]> SET @lastFeedId := 500_000;
+ERROR 1054 (42S22): Unknown column '500_000' in 'field list'
+MariaDB [testdb]> 
+MariaDB [testdb]> SELECT
+    ->     f.id AS feedId,
+    ->     u.id AS userId,
+    ->     f.content AS content,
+    ->     f.author AS author,
+    ->     f.feed_type AS feedType,
+    ->     (SELECT COUNT(*) FROM feed_likes l WHERE l.feed_id = f.id) AS likeCount,
+    ->     (SELECT COUNT(*) FROM comment c WHERE c.feed_id = f.id AND c.deleted_at IS NULL) AS commentCount,
+    ->     (EXISTS (
+    ->         SELECT 1 FROM feed_likes l
+    ->         WHERE l.feed_id = f.id AND l.user_id = 1
+    ->     )) AS isLiked,
+    ->     f.created_at AS createdAt,
+    ->     f.updated_at AS updatedAt,
+    ->     f.deleted_at AS deletedAt
+    -> FROM feeds f
+    -> JOIN users u ON f.user_id = u.id
+    -> WHERE f.id < @lastFeedId AND f.deleted_at IS NULL
+    -> ORDER BY f.created_at DESC
+    -> LIMIT 10;
++--------+--------+----------------------------+-------------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+| feedId | userId | content                    | author      | feedType | likeCount | commentCount | isLiked | createdAt                  | updatedAt                  | deletedAt |
++--------+--------+----------------------------+-------------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+| 999999 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.956002 | 2025-05-28 17:10:59.956002 | NULL      |
+| 999998 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955875 | 2025-05-28 17:10:59.955875 | NULL      |
+| 999997 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955748 | 2025-05-28 17:10:59.955748 | NULL      |
+| 999996 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955622 | 2025-05-28 17:10:59.955622 | NULL      |
+| 999995 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955489 | 2025-05-28 17:10:59.955489 | NULL      |
+| 999994 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955370 | 2025-05-28 17:10:59.955370 | NULL      |
+| 999993 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955247 | 2025-05-28 17:10:59.955247 | NULL      |
+| 999992 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.955119 | 2025-05-28 17:10:59.955119 | NULL      |
+| 999991 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.954998 | 2025-05-28 17:10:59.954998 | NULL      |
+| 999990 |  30000 | 테스트 피드입니다.         | writer_9999 | RED      |         0 |            0 |       0 | 2025-05-28 17:10:59.954841 | 2025-05-28 17:10:59.954841 | NULL      |
++--------+--------+----------------------------+-------------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+10 rows in set (2.967 sec)
+
+MariaDB [testdb]> SET @lastFeedId := 500000;
+Query OK, 0 rows affected (0.003 sec)
+
+MariaDB [testdb]> SELECT
+    ->     f.id AS feedId,
+    ->     u.id AS userId,
+    ->     f.content AS content,
+    ->     f.author AS author,
+    ->     f.feed_type AS feedType,
+    ->     (SELECT COUNT(*) FROM feed_likes l WHERE l.feed_id = f.id) AS likeCount,
+    ->     (SELECT COUNT(*) FROM comment c WHERE c.feed_id = f.id AND c.deleted_at IS NULL) AS commentCount,
+    ->     (EXISTS (
+    ->         SELECT 1 FROM feed_likes l
+    ->         WHERE l.feed_id = f.id AND l.user_id = 1
+    ->     )) AS isLiked,
+    ->     f.created_at AS createdAt,
+    ->     f.updated_at AS updatedAt,
+    ->     f.deleted_at AS deletedAt
+    -> FROM feeds f
+    -> JOIN users u ON f.user_id = u.id
+    -> WHERE f.id < @lastFeedId AND f.deleted_at IS NULL
+    -> ORDER BY f.created_at DESC
+    -> LIMIT 10;
++--------+--------+----------------------------+-------------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+| feedId | userId | content                    | author      | feedType | likeCount | commentCount | isLiked | createdAt                  | updatedAt                  | deletedAt |
++--------+--------+----------------------------+-------------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+| 499999 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.533557 | 2025-05-28 17:09:35.533557 | NULL      |
+| 499998 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.533392 | 2025-05-28 17:09:35.533392 | NULL      |
+| 499997 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.533176 | 2025-05-28 17:09:35.533176 | NULL      |
+| 499996 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.532954 | 2025-05-28 17:09:35.532954 | NULL      |
+| 499995 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.532801 | 2025-05-28 17:09:35.532801 | NULL      |
+| 499994 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.532615 | 2025-05-28 17:09:35.532615 | NULL      |
+| 499993 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.532436 | 2025-05-28 17:09:35.532436 | NULL      |
+| 499992 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.532240 | 2025-05-28 17:09:35.532240 | NULL      |
+| 499991 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.532033 | 2025-05-28 17:09:35.532033 | NULL      |
+| 499990 |  25000 | 테스트 피드입니다.         | writer_4999 | RED      |         0 |            0 |       0 | 2025-05-28 17:09:35.531818 | 2025-05-28 17:09:35.531818 | NULL      |
++--------+--------+----------------------------+-------------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+10 rows in set (1.540 sec)
+
+MariaDB [testdb]> SET @lastFeedId := 10000;
+Query OK, 0 rows affected (0.001 sec)
+
+MariaDB [testdb]> SELECT
+    ->     f.id AS feedId,
+    ->     u.id AS userId,
+    ->     f.content AS content,
+    ->     f.author AS author,
+    ->     f.feed_type AS feedType,
+    ->     (SELECT COUNT(*) FROM feed_likes l WHERE l.feed_id = f.id) AS likeCount,
+    ->     (SELECT COUNT(*) FROM comment c WHERE c.feed_id = f.id AND c.deleted_at IS NULL) AS commentCount,
+    ->     (EXISTS (
+    ->         SELECT 1 FROM feed_likes l
+    ->         WHERE l.feed_id = f.id AND l.user_id = 1
+    ->     )) AS isLiked,
+    ->     f.created_at AS createdAt,
+    ->     f.updated_at AS updatedAt,
+    ->     f.deleted_at AS deletedAt
+    -> FROM feeds f
+    -> JOIN users u ON f.user_id = u.id
+    -> WHERE f.id < @lastFeedId AND f.deleted_at IS NULL
+    -> ORDER BY f.created_at DESC
+    -> LIMIT 10;
++--------+--------+----------------------------+-----------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+| feedId | userId | content                    | author    | feedType | likeCount | commentCount | isLiked | createdAt                  | updatedAt                  | deletedAt |
++--------+--------+----------------------------+-----------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+|   9999 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         1 |            1 |       0 | 2025-05-28 17:08:11.050675 | 2025-05-28 17:08:11.050675 | NULL      |
+|   9998 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         0 |            0 |       0 | 2025-05-28 17:08:11.050363 | 2025-05-28 17:08:11.050363 | NULL      |
+|   9997 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         1 |            1 |       0 | 2025-05-28 17:08:11.050046 | 2025-05-28 17:08:11.050046 | NULL      |
+|   9996 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         0 |            0 |       0 | 2025-05-28 17:08:11.049768 | 2025-05-28 17:08:11.049768 | NULL      |
+|   9995 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         1 |            1 |       0 | 2025-05-28 17:08:11.049475 | 2025-05-28 17:08:11.049475 | NULL      |
+|   9994 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         0 |            0 |       0 | 2025-05-28 17:08:11.049185 | 2025-05-28 17:08:11.049185 | NULL      |
+|   9993 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         1 |            1 |       0 | 2025-05-28 17:08:11.048884 | 2025-05-28 17:08:11.048884 | NULL      |
+|   9992 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         0 |            0 |       0 | 2025-05-28 17:08:11.048603 | 2025-05-28 17:08:11.048603 | NULL      |
+|   9991 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         1 |            1 |       0 | 2025-05-28 17:08:11.048299 | 2025-05-28 17:08:11.048299 | NULL      |
+|   9990 |  20100 | 테스트 피드입니다.         | writer_99 | RED      |         0 |            0 |       0 | 2025-05-28 17:08:11.048024 | 2025-05-28 17:08:11.048024 | NULL      |
++--------+--------+----------------------------+-----------+----------+-----------+--------------+---------+----------------------------+----------------------------+-----------+
+10 rows in set (0.012 sec)
+
+MariaDB [testdb]> SHOW PROFILE FOR QUERY N;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'N' at line 1
+MariaDB [testdb]> SET profiling = 1;
+Query OK, 0 rows affected (0.006 sec)
+
+MariaDB [testdb]> SHOW PROFILE FOR QUERY N;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'N' at line 1
+MariaDB [testdb]> SHOW PROFILES;
++----------+------------+--------------------------+
+| Query_ID | Duration   | Query                    |
++----------+------------+--------------------------+
+|        1 | 0.00093837 | SHOW PROFILE FOR QUERY N |
++----------+------------+--------------------------+
+1 row in set (0.002 sec)
+
+MariaDB [testdb]> SHOW INDEX FROM feeds;
++-------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| Table | Non_unique | Key_name                    | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Ignored |
++-------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| feeds |          0 | PRIMARY                     |            1 | id          | A         |      994143 |     NULL | NULL   |      | BTREE      |         |               | NO      |
+| feeds |          1 | FKa4nmt7wyx9clm9okj61dgd1tw |            1 | user_id     | A         |        9746 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
++-------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+2 rows in set (0.020 sec)
+
+MariaDB [testdb]> SHOW INDEX FROM feed_likes;
++------------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| Table      | Non_unique | Key_name                    | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Ignored |
++------------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| feed_likes |          0 | PRIMARY                     |            1 | feed_id     | A         |       10000 |     NULL | NULL   |      | BTREE      |         |               | NO      |
+| feed_likes |          0 | PRIMARY                     |            2 | user_id     | A         |       10000 |     NULL | NULL   |      | BTREE      |         |               | NO      |
+| feed_likes |          1 | FK175nyoba7h0i45nliuu1ixoob |            1 | user_id     | A         |       10000 |     NULL | NULL   |      | BTREE      |         |               | NO      |
++------------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+3 rows in set (0.001 sec)
+
+MariaDB [testdb]> SHOW INDEX FROM comment;
++---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| Table   | Non_unique | Key_name                    | Seq_in_index | Column_name       | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Ignored |
++---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| comment |          0 | PRIMARY                     |            1 | id                | A         |        9754 |     NULL | NULL   |      | BTREE      |         |               | NO      |
+| comment |          1 | FKbrdiio4mb4neitxqnct4v35o2 |            1 | feed_id           | A         |        9754 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| comment |          1 | FKhvh0e2ybgg16bpu229a5teje7 |            1 | parent_comment_id | A         |           1 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| comment |          1 | FKqm52p1v3o13hy268he0wcngr5 |            1 | user_id           | A         |        9754 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
++---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+4 rows in set (0.001 sec)
+
+MariaDB [testdb]> SHOW PROCESSLIST;
++----+----------+--------------------+--------+---------+------+----------+------------------+----------+
+| Id | User     | Host               | db     | Command | Time | State    | Info             | Progress |
++----+----------+--------------------+--------+---------+------+----------+------------------+----------+
+|  3 | testuser | localhost          | testdb | Query   |    0 | starting | SHOW PROCESSLIST |    0.000 |
+| 40 | testuser | 192.168.65.1:23923 | testdb | Sleep   | 4330 |          | NULL             |    0.000 |
+| 53 | testuser | 192.168.65.1:62170 | testdb | Sleep   | 1670 |          | NULL             |    0.000 |
+| 54 | testuser | 192.168.65.1:21014 | testdb | Sleep   | 1652 |          | NULL             |    0.000 |
+| 55 | testuser | 192.168.65.1:38833 | testdb | Sleep   | 1650 |          | NULL             |    0.000 |
+| 56 | testuser | 192.168.65.1:62474 | testdb | Sleep   | 1645 |          | NULL             |    0.000 |
+| 57 | testuser | 192.168.65.1:35492 | testdb | Sleep   | 1637 |          | NULL             |    0.000 |
+| 58 | testuser | 192.168.65.1:37928 | testdb | Sleep   | 1634 |          | NULL             |    0.000 |
+| 59 | testuser | 192.168.65.1:29168 | testdb | Sleep   | 1618 |          | NULL             |    0.000 |
+| 60 | testuser | 192.168.65.1:53188 | testdb | Sleep   | 1611 |          | NULL             |    0.000 |
+| 61 | testuser | 192.168.65.1:43241 | testdb | Sleep   | 1604 |          | NULL             |    0.000 |
+| 62 | testuser | 192.168.65.1:35129 | testdb | Sleep   | 1598 |          | NULL             |    0.000 |
++----+----------+--------------------+--------+---------+------+----------+------------------+----------+
+12 rows in set (0.004 sec)
+
+MariaDB [testdb]> DROP INDEX IF EXISTS idx_feed_deleted_at ON feeds;
+Query OK, 0 rows affected, 1 warning (0.005 sec)
+Records: 0  Duplicates: 0  Warnings: 1
+
+MariaDB [testdb]> DROP INDEX IF EXISTS idx_feed_created_at ON feeds;
+Query OK, 0 rows affected, 1 warning (0.004 sec)
+Records: 0  Duplicates: 0  Warnings: 1
+
+MariaDB [testdb]> REATE INDEX idx_feeds_deleted_created ON feeds(deleted_at, created_at DESC);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'REATE INDEX idx_feeds_deleted_created ON feeds(deleted_at, created_at DESC)' at line 1
+MariaDB [testdb]> CREATE INDEX idx_feeds_deleted_created ON feeds(deleted_at, created_at DESC);
+^[[A^[[B
+                
+SHOW PROCESSLIST;
+Query OK, 0 rows affected (17 min 48.811 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MariaDB [testdb]> 
+MariaDB [testdb]> 
+MariaDB [testdb]> SHOW PROCESSLIST;
++----+----------+--------------------+--------+---------+------+----------+------------------+----------+
+| Id | User     | Host               | db     | Command | Time | State    | Info             | Progress |
++----+----------+--------------------+--------+---------+------+----------+------------------+----------+
+|  3 | testuser | localhost          | testdb | Query   |    0 | starting | SHOW PROCESSLIST |    0.000 |
+| 63 | testuser | 192.168.65.1:17122 | testdb | Sleep   | 1475 |          | NULL             |    0.000 |
+| 64 | testuser | 192.168.65.1:65427 | testdb | Sleep   | 1457 |          | NULL             |    0.000 |
+| 65 | testuser | 192.168.65.1:54399 | testdb | Sleep   | 1439 |          | NULL             |    0.000 |
+| 66 | testuser | 192.168.65.1:32009 | testdb | Sleep   | 1431 |          | NULL             |    0.000 |
+| 67 | testuser | 192.168.65.1:33867 | testdb | Sleep   | 1427 |          | NULL             |    0.000 |
+| 68 | testuser | 192.168.65.1:49964 | testdb | Sleep   | 1422 |          | NULL             |    0.000 |
+| 69 | testuser | 192.168.65.1:46995 | testdb | Sleep   | 1409 |          | NULL             |    0.000 |
+| 70 | testuser | 192.168.65.1:64453 | testdb | Sleep   | 1403 |          | NULL             |    0.000 |
+| 71 | testuser | 192.168.65.1:41201 | testdb | Sleep   | 1401 |          | NULL             |    0.000 |
+| 72 | testuser | 192.168.65.1:39355 | testdb | Sleep   | 1374 |          | NULL             |    0.000 |
+| 73 | testuser | localhost          | testdb | Sleep   |    1 |          | NULL             |    0.000 |
++----+----------+--------------------+--------+---------+------+----------+------------------+----------+
+12 rows in set (0.001 sec)
+
+MariaDB [testdb]> CREATE INDEX idx_feeds_deleted_created ON feeds(deleted_at, created_at DESC);
+ERROR 2006 (HY000): Server has gone away
+No connection. Trying to reconnect...
+Connection id:    74
+Current database: testdb
+
+ERROR 1061 (42000): Duplicate key name 'idx_feeds_deleted_created'
+MariaDB [testdb]> SHOW INDEX FROM feeds WHERE Key_name = 'idx_feeds_deleted_created';
++-------+------------+---------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| Table | Non_unique | Key_name                  | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Ignored |
++-------+------------+---------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| feeds |          1 | idx_feeds_deleted_created |            1 | deleted_at  | A         |           1 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| feeds |          1 | idx_feeds_deleted_created |            2 | created_at  | D         |      994143 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
++-------+------------+---------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+2 rows in set (0.013 sec)
+
+MariaDB [testdb]> CREATE INDEX idx_comment_feed_deleted ON comment(feed_id, deleted_at);
+Query OK, 0 rows affected (0.044 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MariaDB [testdb]> show tables
+    -> ;
++--------------------------+
+| Tables_in_testdb         |
++--------------------------+
+| account_status_histories |
+| comment                  |
+| comment_likes            |
+| feed_likes               |
+| feeds                    |
+| refresh_token            |
+| user_setting             |
+| users                    |
++--------------------------+
+8 rows in set (0.002 sec)
+
+MariaDB [testdb]> select COUNT(1) from feeds;
++----------+
+| COUNT(1) |
++----------+
+|  1000000 |
++----------+
+1 row in set (0.272 sec)
+
+MariaDB [testdb]> SHOW INDEX FROM comment;
++---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| Table   | Non_unique | Key_name                    | Seq_in_index | Column_name       | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Ignored |
++---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| comment |          0 | PRIMARY                     |            1 | id                | A         |        9754 |     NULL | NULL   |      | BTREE      |         |               | NO      |
+| comment |          1 | FKhvh0e2ybgg16bpu229a5teje7 |            1 | parent_comment_id | A         |           1 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| comment |          1 | FKqm52p1v3o13hy268he0wcngr5 |            1 | user_id           | A         |        9754 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| comment |          1 | idx_comment_feed_deleted    |            1 | feed_id           | A         |        9754 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| comment |          1 | idx_comment_feed_deleted    |            2 | deleted_at        | A         |        9754 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
++---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+5 rows in set (0.007 sec)
+
+MariaDB [testdb]> 
+MariaDB [testdb]> EXPLAIN
+    -> SELECT
+    ->     f.id AS feedId,
+    ->     u.id AS userId,
+    ->     f.content AS content,
+    ->     f.author AS author,
+    ->     f.feed_type AS feedType,
+    ->     (SELECT COUNT(*) FROM feed_likes l WHERE l.feed_id = f.id) AS likeCount,
+    ->     (SELECT COUNT(*) FROM comment c WHERE c.feed_id = f.id AND c.deleted_at IS NULL) AS commentCount,
+    ->     (EXISTS (
+    ->         SELECT 1 FROM feed_likes l
+    ->         WHERE l.feed_id = f.id AND l.user_id = 1
+    ->     )) AS isLiked,
+    ->     f.created_at AS createdAt,
+    ->     f.updated_at AS updatedAt,
+    ->     f.deleted_at AS deletedAt
+    -> FROM feeds f
+    -> JOIN users u ON f.user_id = u.id
+    -> WHERE (0 = 0 OR f.id < 100000) AND f.deleted_at IS NULL
+    -> ORDER BY f.created_at DESC
+    -> LIMIT 10;
++------+--------------------+-------+--------+-------------------------------------------------------+-----------------------------+---------+-------------------+--------+--------------------------+
+| id   | select_type        | table | type   | possible_keys                                         | key                         | key_len | ref               | rows   | Extra                    |
++------+--------------------+-------+--------+-------------------------------------------------------+-----------------------------+---------+-------------------+--------+--------------------------+
+|    1 | PRIMARY            | f     | range  | FKa4nmt7wyx9clm9okj61dgd1tw,idx_feeds_deleted_created | idx_feeds_deleted_created   | 9       | NULL              | 994143 | Using where              |
+|    1 | PRIMARY            | u     | eq_ref | PRIMARY                                               | PRIMARY                     | 8       | testdb.f.user_id  | 1      |                          |
+|    4 | DEPENDENT SUBQUERY | l     | eq_ref | PRIMARY,FK175nyoba7h0i45nliuu1ixoob                   | FK175nyoba7h0i45nliuu1ixoob | 16      | const,testdb.f.id | 1      | Using index              |
+|    3 | DEPENDENT SUBQUERY | c     | ref    | idx_comment_feed_deleted                              | idx_comment_feed_deleted    | 18      | testdb.f.id,const | 1      | Using where; Using index |
+|    2 | DEPENDENT SUBQUERY | l     | ref    | PRIMARY                                               | PRIMARY                     | 8       | testdb.f.id       | 1      |                          |
++------+--------------------+-------+--------+-------------------------------------------------------+-----------------------------+---------+-------------------+--------+--------------------------+
+5 rows in set (0.020 sec)
+
+MariaDB [testdb]> SELECT COUNT(1) AS COUNT_FEEDS FROM feeds; SELECT COUNT(1) AS COUNT_COMMENTS FROM comment;  SELECT COUNT(1) AS FEED_LIKES FROM feed_likes;
++-------------+
+| COUNT_FEEDS |
++-------------+
+|     1000000 |
++-------------+
+1 row in set (0.195 sec)
+
++----------------+
+| COUNT_COMMENTS |
++----------------+
+|          10000 |
++----------------+
+1 row in set (0.006 sec)
+
++------------+
+| FEED_LIKES |
++------------+
+|      10000 |
++------------+
+1 row in set (0.004 sec)
+
+MariaDB [testdb]>  SELECT COUNT(1) AS COUNT_USERS FROM users;
++-------------+
+| COUNT_USERS |
++-------------+
+|       30000 |
++-------------+
+1 row in set (0.023 sec)
+
+MariaDB [testdb]> MariaDB [testdb]> SELECT COUNT(1) AS COUNT_FEEDS FROM feeds; SELECT COUNT(1) AS COUNT_COMMENTS FROM comment;  SELECT COUNT(1) AS FEED_LIKES FROM feed_likes;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'MariaDB [testdb]> SELECT COUNT(1) AS COUNT_FEEDS FROM feeds' at line 1
++----------------+
+| COUNT_COMMENTS |
++----------------+
+|          10000 |
++----------------+
+1 row in set (0.003 sec)
+
++------------+
+| FEED_LIKES |
++------------+
+|      10000 |
++------------+
+1 row in set (0.002 sec)
+
+MariaDB [testdb]> +-------------+
+    -> | COUNT_FEEDS |
+    -> +-------------+
+    -> |     1000000 |
+    -> +-------------+
+    -> 1 row in set (0.195 sec)
+    -> 
+    -> +----------------+
+    -> | COUNT_COMMENTS |
+    -> +----------------+
+    -> |          10000 |
+    -> +----------------+
+    -> 1 row in set (0.006 sec)
+    -> 
+    -> +------------+
+    -> | FEED_LIKES |
+    -> +------------+
+    -> |      10000 |
+    -> +------------+
+    -> 1 row in set (0.004 sec)
+    -> 
+    -> MariaDB [testdb]>  SELECT COUNT(1) AS COUNT_USERS FROM users;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '+-------------+
+| COUNT_FEEDS |
++-------------+
+|     1000000 |
++------------...' at line 1
+MariaDB [testdb]> +-------------+
+    -> | COUNT_USERS |
+    -> +-------------+
+    -> |       30000 |
+    -> +-------------+
+    -> 1 row in set (0.023 sec)sfd
+    -> d;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '+-------------+
+| COUNT_USERS |
++-------------+
+|       30000 |
++------------...' at line 1
+MariaDB [testdb]> SHOW PROCESSLIST;
++----+----------+-----------+--------+---------+------+----------+------------------+----------+
+| Id | User     | Host      | db     | Command | Time | State    | Info             | Progress |
++----+----------+-----------+--------+---------+------+----------+------------------+----------+
+| 74 | testuser | localhost | testdb | Query   |    0 | starting | SHOW PROCESSLIST |    0.000 |
++----+----------+-----------+--------+---------+------+----------+------------------+----------+
+1 row in set (0.013 sec)
+
+MariaDB [testdb]> SHOW INDEX FROM FEEDS;
+ERROR 1146 (42S02): Table 'testdb.FEEDS' doesn't exist
+MariaDB [testdb]> show tables;
++--------------------------+
+| Tables_in_testdb         |
++--------------------------+
+| account_status_histories |
+| comment                  |
+| comment_likes            |
+| feed_likes               |
+| feeds                    |
+| refresh_token            |
+| user_setting             |
+| users                    |
++--------------------------+
+8 rows in set (0.007 sec)
+
+MariaDB [testdb]> show index from feeds;
++-------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| Table | Non_unique | Key_name                    | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Ignored |
++-------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| feeds |          0 | PRIMARY                     |            1 | id          | A         |      994143 |     NULL | NULL   |      | BTREE      |         |               | NO      |
+| feeds |          1 | FKa4nmt7wyx9clm9okj61dgd1tw |            1 | user_id     | A         |        9746 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| feeds |          1 | idx_feeds_deleted_created   |            1 | deleted_at  | A         |           1 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| feeds |          1 | idx_feeds_deleted_created   |            2 | created_at  | D         |      994143 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
++-------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+4 rows in set (0.004 sec)
+
+MariaDB [testdb]> DROP INDEX idx_feeds_deleted_created ON feeds;
+Query OK, 0 rows affected (0.052 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MariaDB [testdb]> show index from feeds;
++-------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| Table | Non_unique | Key_name                    | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Ignored |
++-------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| feeds |          0 | PRIMARY                     |            1 | id          | A         |      994143 |     NULL | NULL   |      | BTREE      |         |               | NO      |
+| feeds |          1 | FKa4nmt7wyx9clm9okj61dgd1tw |            1 | user_id     | A         |        9746 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
++-------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+2 rows in set (0.003 sec)
+
+MariaDB [testdb]> show index from comment;
++---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| Table   | Non_unique | Key_name                    | Seq_in_index | Column_name       | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Ignored |
++---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| comment |          0 | PRIMARY                     |            1 | id                | A         |        9754 |     NULL | NULL   |      | BTREE      |         |               | NO      |
+| comment |          1 | FKhvh0e2ybgg16bpu229a5teje7 |            1 | parent_comment_id | A         |           1 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| comment |          1 | FKqm52p1v3o13hy268he0wcngr5 |            1 | user_id           | A         |        9754 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| comment |          1 | idx_comment_feed_deleted    |            1 | feed_id           | A         |        9754 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| comment |          1 | idx_comment_feed_deleted    |            2 | deleted_at        | A         |        9754 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
++---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+5 rows in set (0.007 sec)
+
+MariaDB [testdb]> DROP INDEX idx_comment_feed_deleted ON comment;
+ERROR 1553 (HY000): Cannot drop index 'idx_comment_feed_deleted': needed in a foreign key constraint
+MariaDB [testdb]> MariaDB [testdb]> show index from comment;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'MariaDB [testdb]> show index from comment' at line 1
+MariaDB [testdb]> +---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+    -> | Table   | Non_unique | Key_name                    | Seq_in_index | Column_name       | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Ignored |
+    -> +---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+    -> | comment |          0 | PRIMARY                     |            1 | id                | A         |        9754 |     NULL | NULL   |      | BTREE      |         |               | NO      |
+    -> | comment |          1 | FKhvh0e2ybgg16bpu229a5teje7 |            1 | parent_comment_id | A         |           1 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+    -> | comment |          1 | FKqm52p1v3o13hy268he0wcngr5 |            1 | user_id           | A         |        9754 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+    -> | comment |          1 | idx_comment_feed_deleted    |            1 | feed_id           | A         |        9754 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+    -> | comment |          1 | idx_comment_feed_deleted    |            2 | deleted_at        | A         |        9754 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+    -> +---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+    -> ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '+---------+------------+-----------------------------+--------------+--------...' at line 1
+MariaDB [testdb]> SELECT CONSTRAINT_NAME
+    -> FROM information_schema.KEY_COLUMN_USAGE
+    -> WHERE TABLE_NAME = 'comment' AND COLUMN_NAME = 'feed_id';
++-----------------------------+
+| CONSTRAINT_NAME             |
++-----------------------------+
+| FKbrdiio4mb4neitxqnct4v35o2 |
++-----------------------------+
+1 row in set (0.016 sec)
+
+MariaDB [testdb]> ALTER TABLE comment DROP FOREIGN KEY FKbrdiio4mb4neitxqnct4v35o2;
+Query OK, 0 rows affected (0.034 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MariaDB [testdb]> SELECT CONSTRAINT_NAME
+    -> FROM information_schema.KEY_COLUMN_USAGE
+    -> WHERE TABLE_NAME = 'comment' AND COLUMN_NAME = 'feed_id';
+Empty set (0.007 sec)
+
+MariaDB [testdb]> DROP INDEX idx_comment_feed_deleted ON comment;
+Query OK, 0 rows affected (0.017 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MariaDB [testdb]> ALTER TABLE comment
+    -> ADD CONSTRAINT FK_comment_feed
+    -> FOREIGN KEY (feed_id)
+    -> REFERENCES feed(id);
+ERROR 1005 (HY000): Can't create table `testdb`.`comment` (errno: 150 "Foreign key constraint is incorrectly formed")
+MariaDB [testdb]> ALTER TABLE comment
+    -> ADD CONSTRAINT FK_comment_feed
+    -> FOREIGN KEY (feed_id)
+    -> REF
+    -> ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'REF' at line 4
+MariaDB [testdb]> SHOW COLUMNS FROM feed LIKE 'id';
+ERROR 1146 (42S02): Table 'testdb.feed' doesn't exist
+MariaDB [testdb]> SHOW COLUMNS FROM comment LIKE 'feed_id';
++---------+------------+------+-----+---------+-------+
+| Field   | Type       | Null | Key | Default | Extra |
++---------+------------+------+-----+---------+-------+
+| feed_id | bigint(20) | YES  |     | NULL    |       |
++---------+------------+------+-----+---------+-------+
+1 row in set (0.015 sec)
+
+MariaDB [testdb]> SHOW COLUMNS FROM feed LIKE 'id';
+ERROR 1146 (42S02): Table 'testdb.feed' doesn't exist
+MariaDB [testdb]> SHOW COLUMNS FROM feeds LIKE 'id';
++-------+------------+------+-----+---------+----------------+
+| Field | Type       | Null | Key | Default | Extra          |
++-------+------------+------+-----+---------+----------------+
+| id    | bigint(20) | NO   | PRI | NULL    | auto_increment |
++-------+------------+------+-----+---------+----------------+
+1 row in set (0.009 sec)
+
+MariaDB [testdb]> SHOW COLUMNS FROM comment LIKE 'feed_id';
++---------+------------+------+-----+---------+-------+
+| Field   | Type       | Null | Key | Default | Extra |
++---------+------------+------+-----+---------+-------+
+| feed_id | bigint(20) | YES  |     | NULL    |       |
++---------+------------+------+-----+---------+-------+
+1 row in set (0.014 sec)
+
+MariaDB [testdb]> ALTER TABLE comment
+    ->   ADD CONSTRAINT FK_comment_feed
+    ->   FOREIGN KEY (feed_id)
+    ->   REFERENCES feeds(id);
+Query OK, 10000 rows affected (0.199 sec)                  
+Records: 10000  Duplicates: 0  Warnings: 0
+
+MariaDB [testdb]> show index from comment;
++---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| Table   | Non_unique | Key_name                    | Seq_in_index | Column_name       | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Ignored |
++---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| comment |          0 | PRIMARY                     |            1 | id                | A         |       10009 |     NULL | NULL   |      | BTREE      |         |               | NO      |
+| comment |          1 | FKhvh0e2ybgg16bpu229a5teje7 |            1 | parent_comment_id | A         |           1 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| comment |          1 | FKqm52p1v3o13hy268he0wcngr5 |            1 | user_id           | A         |       10009 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| comment |          1 | FK_comment_feed             |            1 | feed_id           | A         |       10009 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
++---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+4 rows in set (0.012 sec)
+
+MariaDB [testdb]> 
+MariaDB [testdb]> EXPLAIN
+    -> SELECT
+    ->     f.id AS feedId,
+    ->     u.id AS userId,
+    ->     f.content AS content,
+    ->     f.author AS author,
+    ->     f.feed_type AS feedType,
+    ->     (SELECT COUNT(*) FROM feed_likes l WHERE l.feed_id = f.id) AS likeCount,
+    ->     (SELECT COUNT(*) FROM comment c WHERE c.feed_id = f.id AND c.deleted_at IS NULL) AS commentCount,
+    ->     (EXISTS (
+    ->         SELECT 1 FROM feed_likes l
+    ->         WHERE l.feed_id = f.id AND l.user_id = 1
+    ->     )) AS isLiked,
+    ->     f.created_at AS createdAt,
+    ->     f.updated_at AS updatedAt,
+    ->     f.deleted_at AS deletedAt
+    -> FROM feeds f
+    -> JOIN users u ON f.user_id = u.id
+    -> WHERE (0 = 0 OR f.id < 100000) AND f.deleted_at IS NULL
+    -> ORDER BY f.created_at DESC
+    -> LIMIT 10;
++------+--------------------+-------+--------+-------------------------------------+-----------------------------+---------+-------------------+--------+-----------------------------+
+| id   | select_type        | table | type   | possible_keys                       | key                         | key_len | ref               | rows   | Extra                       |
++------+--------------------+-------+--------+-------------------------------------+-----------------------------+---------+-------------------+--------+-----------------------------+
+|    1 | PRIMARY            | f     | ALL    | FKa4nmt7wyx9clm9okj61dgd1tw         | NULL                        | NULL    | NULL              | 994143 | Using where; Using filesort |
+|    1 | PRIMARY            | u     | eq_ref | PRIMARY                             | PRIMARY                     | 8       | testdb.f.user_id  | 1      |                             |
+|    4 | DEPENDENT SUBQUERY | l     | eq_ref | PRIMARY,FK175nyoba7h0i45nliuu1ixoob | FK175nyoba7h0i45nliuu1ixoob | 16      | const,testdb.f.id | 1      | Using index                 |
+|    3 | DEPENDENT SUBQUERY | c     | ref    | FK_comment_feed                     | FK_comment_feed             | 9       | testdb.f.id       | 1      | Using where                 |
+|    2 | DEPENDENT SUBQUERY | l     | ref    | PRIMARY                             | PRIMARY                     | 8       | testdb.f.id       | 1      |                             |
++------+--------------------+-------+--------+-------------------------------------+-----------------------------+---------+-------------------+--------+-----------------------------+
+5 rows in set (0.009 sec)
+
+MariaDB [testdb]> SHOW VARIABLES LIKE 'query_cache_type';
++------------------+-------+
+| Variable_name    | Value |
++------------------+-------+
+| query_cache_type | OFF   |
++------------------+-------+
+1 row in set (0.007 sec)
+
+MariaDB [testdb]> SHOW VARIABLES LIKE 'query_cache_size';
++------------------+---------+
+| Variable_name    | Value   |
++------------------+---------+
+| query_cache_size | 1048576 |
++------------------+---------+
+1 row in set (0.005 sec)
+
+MariaDB [testdb]> SET GLOBAL innodb_buffer_pool_size = innodb_buffer_pool_size;
+ERROR 1227 (42000): Access denied; you need (at least one of) the SUPER privilege(s) for this operation
+MariaDB [testdb]> 

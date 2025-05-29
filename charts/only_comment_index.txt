@@ -1,0 +1,59 @@
+==================================================================================================
+# CREATE INDEX idx_comment_feed_deleted ON comment(feed_id, deleted_at);
+==================================================================================================
+
+MariaDB [testdb]> DROP INDEX idx_feeds_deleted_created ON feeds;
+Query OK, 0 rows affected (0.019 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MariaDB [testdb]> EXPLAIN
+    -> SELECT
+    ->     f.id AS feedId,
+    ->     u.id AS userId,
+    ->     f.content AS content,
+    ->     f.author AS author,
+    ->     f.feed_type AS feedType,
+    ->     (SELECT COUNT(*) FROM feed_likes l WHERE l.feed_id = f.id) AS likeCount,
+    ->     (SELECT COUNT(*) FROM comment c WHERE c.feed_id = f.id AND c.deleted_at IS NULL) AS commentCount,
+    ->     (EXISTS (
+    ->         SELECT 1 FROM feed_likes l
+    ->         WHERE l.feed_id = f.id AND l.user_id = 1
+    ->     )) AS isLiked,
+    ->     f.created_at AS createdAt,
+    ->     f.updated_at AS updatedAt,
+    ->     f.deleted_at AS deletedAt
+    -> FROM feeds f
+    -> JOIN users u ON f.user_id = u.id
+    -> WHERE (0 = 0 OR f.id < 100000) AND f.deleted_at IS NULL
+    -> ORDER BY f.created_at DESC
+    -> LIMIT 10;
++------+--------------------+-------+--------+-------------------------------------+-----------------------------+---------+-------------------+--------+-----------------------------+
+| id   | select_type        | table | type   | possible_keys                       | key                         | key_len | ref               | rows   | Extra                       |
++------+--------------------+-------+--------+-------------------------------------+-----------------------------+---------+-------------------+--------+-----------------------------+
+|    1 | PRIMARY            | f     | ALL    | FKa4nmt7wyx9clm9okj61dgd1tw         | NULL                        | NULL    | NULL              | 994238 | Using where; Using filesort |
+|    1 | PRIMARY            | u     | eq_ref | PRIMARY                             | PRIMARY                     | 8       | testdb.f.user_id  | 1      |                             |
+|    4 | DEPENDENT SUBQUERY | l     | eq_ref | PRIMARY,FK175nyoba7h0i45nliuu1ixoob | FK175nyoba7h0i45nliuu1ixoob | 16      | const,testdb.f.id | 1      | Using index                 |
+|    3 | DEPENDENT SUBQUERY | c     | ref    | idx_comment_feed_deleted            | idx_comment_feed_deleted    | 18      | testdb.f.id,const | 1      | Using where; Using index    |
+|    2 | DEPENDENT SUBQUERY | l     | ref    | PRIMARY                             | PRIMARY                     | 8       | testdb.f.id       | 1      |                             |
++------+--------------------+-------+--------+-------------------------------------+-----------------------------+---------+-------------------+--------+-----------------------------+
+5 rows in set (0.009 sec)
+
+MariaDB [testdb]> SHOW INDEX FROM comment;SHOW INDEX FROM feeds;
++---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| Table   | Non_unique | Key_name                    | Seq_in_index | Column_name       | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Ignored |
++---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| comment |          0 | PRIMARY                     |            1 | id                | A         |        9754 |     NULL | NULL   |      | BTREE      |         |               | NO      |
+| comment |          1 | FKhvh0e2ybgg16bpu229a5teje7 |            1 | parent_comment_id | A         |           1 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| comment |          1 | FKqm52p1v3o13hy268he0wcngr5 |            1 | user_id           | A         |        9754 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| comment |          1 | idx_comment_feed_deleted    |            1 | feed_id           | A         |        9754 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| comment |          1 | idx_comment_feed_deleted    |            2 | deleted_at        | A         |        9754 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
++---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+5 rows in set (0.004 sec)
+
++-------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| Table | Non_unique | Key_name                    | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Ignored |
++-------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| feeds |          0 | PRIMARY                     |            1 | id          | A         |      994238 |     NULL | NULL   |      | BTREE      |         |               | NO      |
+| feeds |          1 | FKa4nmt7wyx9clm9okj61dgd1tw |            1 | user_id     | A         |       10042 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
++-------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+2 rows in set (0.000 sec)

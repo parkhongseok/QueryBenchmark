@@ -1,0 +1,331 @@
+Last login: Thu May 29 13:17:54 on ttys016
+(base) keinmall@heulim-ui-MacBookAir ProjectDontGoBack % docker-compose restart mariadb
+WARN[0000] The "TAG" variable is not set. Defaulting to a blank string. 
+WARN[0000] The "TAG" variable is not set. Defaulting to a blank string. 
+(base) keinmall@heulim-ui-MacBookAir ProjectDontGoBack % docker-compose down
+WARN[0000] The "TAG" variable is not set. Defaulting to a blank string. 
+WARN[0000] The "TAG" variable is not set. Defaulting to a blank string. 
+(base) keinmall@heulim-ui-MacBookAir ProjectDontGoBack % docker-compose -f docker-compose.dev.yml down
+WARN[0000] /Users/keinmall/Documents/ProjectDontGoBack/docker-compose.dev.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
+[+] Running 2/2
+ ✔ Container dev_mariadb              Removed                              0.8s 
+ ✔ Network projectdontgoback_default  Removed                              0.2s 
+(base) keinmall@heulim-ui-MacBookAir ProjectDontGoBack % docker-compose -f docker-compose.dev.yml up
+WARN[0000] /Users/keinmall/Documents/ProjectDontGoBack/docker-compose.dev.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
+[+] Running 2/2
+ ✔ Network projectdontgoback_default  Created                              0.0s 
+ ✔ Container dev_mariadb              Created                              0.1s 
+Attaching to dev_mariadb
+dev_mariadb  | 2025-05-29 14:21:32+09:00 [Note] [Entrypoint]: Entrypoint script for MariaDB Server 1:11.3.2+maria~ubu2204 started.
+dev_mariadb  | 2025-05-29 14:21:33+09:00 [Warn] [Entrypoint]: /sys/fs/cgroup///memory.pressure not writable, functionality unavailable to MariaDB
+dev_mariadb  | 2025-05-29 14:21:33+09:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+dev_mariadb  | 2025-05-29 14:21:33+09:00 [Note] [Entrypoint]: Entrypoint script for MariaDB Server 1:11.3.2+maria~ubu2204 started.
+dev_mariadb  | 2025-05-29 14:21:33+09:00 [Note] [Entrypoint]: MariaDB upgrade not required
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] Starting MariaDB 11.3.2-MariaDB-1:11.3.2+maria~ubu2204 source revision 068a6819eb63bcb01fdfa037c9bf3bf63c33ee42 as process 1
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] InnoDB: Compressed tables use zlib 1.2.11
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] InnoDB: Number of transaction pools: 1
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] InnoDB: Using ARMv8 crc32 + pmull instructions
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] InnoDB: Using liburing
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] InnoDB: Initializing buffer pool, total size = 128.000MiB, chunk size = 2.000MiB
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] InnoDB: Completed initialization of buffer pool
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] InnoDB: File system buffers for log disabled (block size=512 bytes)
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] InnoDB: End of log at LSN=248159551
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] InnoDB: Opened 3 undo tablespaces
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] InnoDB: 128 rollback segments in 3 undo tablespaces are active.
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] InnoDB: Setting file './ibtmp1' size to 12.000MiB. Physically writing the file full; Please wait ...
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] InnoDB: File './ibtmp1' size is now 12.000MiB.
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] InnoDB: log sequence number 248159551; transaction id 314
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] InnoDB: Loading buffer pool(s) from /var/lib/mysql/ib_buffer_pool
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] Plugin 'FEEDBACK' is disabled.
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] Plugin 'wsrep-provider' is disabled.
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] InnoDB: Buffer pool(s) load completed at 250529 14:21:33
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] Server socket created on IP: '0.0.0.0'.
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] Server socket created on IP: '::'.
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] mariadbd: Event Scheduler: Loaded 0 events
+dev_mariadb  | 2025-05-29 14:21:33 0 [Note] mariadbd: ready for connections.
+dev_mariadb  | Version: '11.3.2-MariaDB-1:11.3.2+maria~ubu2204'  socket: '/run/mysqld/mysqld.sock'  port: 3306  mariadb.org binary distribution
+Gracefully stopping... (press Ctrl+C again to force)
+[+] Stopping 1/1
+ ✔ Container dev_mariadb  Stopped                                          0.4s 
+(base) keinmall@heulim-ui-MacBookAir ProjectDontGoBack % docker-compose -f docker-compose.dev.yml down
+WARN[0000] /Users/keinmall/Documents/ProjectDontGoBack/docker-compose.dev.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
+[+] Running 2/2
+ ✔ Container dev_mariadb              Removed                              0.0s 
+ ✔ Network projectdontgoback_default  Removed                              0.2s 
+(base) keinmall@heulim-ui-MacBookAir ProjectDontGoBack % docker-compose -f docker-compose.dev.yml up -d
+WARN[0000] /Users/keinmall/Documents/ProjectDontGoBack/docker-compose.dev.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
+[+] Running 2/2
+ ✔ Network projectdontgoback_default  Created                              0.0s 
+ ✔ Container dev_mariadb              Started                              0.1s 
+(base) keinmall@heulim-ui-MacBookAir ProjectDontGoBack % docker exec -it dev_mariadb mariadb -utestuser -ptestpass testdb
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 3
+Server version: 11.3.2-MariaDB-1:11.3.2+maria~ubu2204 mariadb.org binary distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [testdb]> SHOW ENGINE INNODB STATUS\G
+ERROR 1227 (42000): Access denied; you need (at least one of) the PROCESS privilege(s) for this operation
+MariaDB [testdb]> show tables;
++--------------------------+
+| Tables_in_testdb         |
++--------------------------+
+| account_status_histories |
+| comment                  |
+| comment_likes            |
+| feed_likes               |
+| feeds                    |
+| refresh_token            |
+| user_setting             |
+| users                    |
++--------------------------+
+8 rows in set (0.005 sec)
+
+MariaDB [testdb]> SHOW PROCESSLIST;
++----+----------+-----------+--------+---------+------+----------+------------------+----------+
+| Id | User     | Host      | db     | Command | Time | State    | Info             | Progress |
++----+----------+-----------+--------+---------+------+----------+------------------+----------+
+|  3 | testuser | localhost | testdb | Query   |    0 | starting | SHOW PROCESSLIST |    0.000 |
++----+----------+-----------+--------+---------+------+----------+------------------+----------+
+1 row in set (0.003 sec)
+
+MariaDB [testdb]> CREATE INDEX idx_comment_feed_deleted ON comment(feed_id, deleted_at);
+Query OK, 0 rows affected (0.051 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MariaDB [testdb]> CREATE INDEX idx_feeds_deleted_created ON feeds(deleted_at, created_at DESC);
+Query OK, 0 rows affected (0.668 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MariaDB [testdb]> EXPLAIN
+    -> SELECT
+    ->     f.id AS feedId,
+    ->     u.id AS userId,
+    ->     f.content AS content,
+    ->     f.author AS author,
+    ->     f.feed_type AS feedType,
+    ->     (SELECT COUNT(*) FROM feed_likes l WHERE l.feed_id = f.id) AS likeCount,
+    ->     (SELECT COUNT(*) FROM comment c WHERE c.feed_id = f.id AND c.deleted_at IS NULL) AS commentCount,
+    ->     (EXISTS (
+    ->         SELECT 1 FROM feed_likes l
+    ->         WHERE l.feed_id = f.id AND l.user_id = 1
+    ->     )) AS isLiked,
+    ->     f.created_at AS createdAt,
+    ->     f.updated_at AS updatedAt,
+    ->     f.deleted_at AS deletedAt
+    -> FROM feeds f
+    -> JOIN users u ON f.user_id = u.id
+    -> WHERE (0 = 0 OR f.id < 100000) AND f.deleted_at IS NULL
+    -> ORDER BY f.created_at DESC
+    -> LIMIT 10;
++------+--------------------+-------+--------+-------------------------------------------------------+-----------------------------+---------+-------------------+--------+--------------------------+
+| id   | select_type        | table | type   | possible_keys                                         | key                         | key_len | ref               | rows   | Extra                    |
++------+--------------------+-------+--------+-------------------------------------------------------+-----------------------------+---------+-------------------+--------+--------------------------+
+|    1 | PRIMARY            | f     | range  | FKa4nmt7wyx9clm9okj61dgd1tw,idx_feeds_deleted_created | idx_feeds_deleted_created   | 9       | NULL              | 994143 | Using where              |
+|    1 | PRIMARY            | u     | eq_ref | PRIMARY                                               | PRIMARY                     | 8       | testdb.f.user_id  | 1      |                          |
+|    4 | DEPENDENT SUBQUERY | l     | eq_ref | PRIMARY,FK175nyoba7h0i45nliuu1ixoob                   | FK175nyoba7h0i45nliuu1ixoob | 16      | const,testdb.f.id | 1      | Using index              |
+|    3 | DEPENDENT SUBQUERY | c     | ref    | idx_comment_feed_deleted                              | idx_comment_feed_deleted    | 18      | testdb.f.id,const | 1      | Using where; Using index |
+|    2 | DEPENDENT SUBQUERY | l     | ref    | PRIMARY                                               | PRIMARY                     | 8       | testdb.f.id       | 1      |                          |
++------+--------------------+-------+--------+-------------------------------------------------------+-----------------------------+---------+-------------------+--------+--------------------------+
+5 rows in set (0.010 sec)
+
+MariaDB [testdb]> SHOW INDEX FROM feeds WHERE Key_name = 'idx_feeds_deleted_created';
++-------+------------+---------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| Table | Non_unique | Key_name                  | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Ignored |
++-------+------------+---------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| feeds |          1 | idx_feeds_deleted_created |            1 | deleted_at  | A         |           1 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| feeds |          1 | idx_feeds_deleted_created |            2 | created_at  | D         |      994143 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
++-------+------------+---------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+2 rows in set (0.015 sec)
+
+MariaDB [testdb]> SHOW INDEX FROM comment;
++---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| Table   | Non_unique | Key_name                    | Seq_in_index | Column_name       | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Ignored |
++---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| comment |          0 | PRIMARY                     |            1 | id                | A         |       10009 |     NULL | NULL   |      | BTREE      |         |               | NO      |
+| comment |          1 | FKhvh0e2ybgg16bpu229a5teje7 |            1 | parent_comment_id | A         |           1 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| comment |          1 | FKqm52p1v3o13hy268he0wcngr5 |            1 | user_id           | A         |       10009 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| comment |          1 | idx_comment_feed_deleted    |            1 | feed_id           | A         |       10009 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| comment |          1 | idx_comment_feed_deleted    |            2 | deleted_at        | A         |       10009 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
++---------+------------+-----------------------------+--------------+-------------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+5 rows in set (0.004 sec)
+
+MariaDB [testdb]> show index from feeds;
++-------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| Table | Non_unique | Key_name                    | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Ignored |
++-------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| feeds |          0 | PRIMARY                     |            1 | id          | A         |      994143 |     NULL | NULL   |      | BTREE      |         |               | NO      |
+| feeds |          1 | FKa4nmt7wyx9clm9okj61dgd1tw |            1 | user_id     | A         |        9746 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| feeds |          1 | idx_feeds_deleted_created   |            1 | deleted_at  | A         |           1 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
+| feeds |          1 | idx_feeds_deleted_created   |            2 | created_at  | D         |      994143 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
++-------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+4 rows in set (0.005 sec)
+
+MariaDB [testdb]> DROP INDEX idx_feeds_deleted_created ON feeds;
+Query OK, 0 rows affected (0.042 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MariaDB [testdb]> show index from feeds;
++-------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| Table | Non_unique | Key_name                    | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Ignored |
++-------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+| feeds |          0 | PRIMARY                     |            1 | id          | A         |      994143 |     NULL | NULL   |      | BTREE      |         |               | NO      |
+| feeds |          1 | FKa4nmt7wyx9clm9okj61dgd1tw |            1 | user_id     | A         |        9746 |     NULL | NULL   | YES  | BTREE      |         |               | NO      |
++-------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+
+2 rows in set (0.004 sec)
+
+MariaDB [testdb]> CREATE INDEX idx_feeds_created_deleted ON feeds(created_at DESC, deleted_at);
+Query OK, 0 rows affected (1.141 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MariaDB [testdb]> EXPLAIN
+    -> SELECT
+    ->     f.id AS feedId,
+    ->     u.id AS userId,
+    ->     f.content AS content,
+    ->     f.author AS author,
+    ->     f.feed_type AS feedType,
+    ->     (SELECT COUNT(*) FROM feed_likes l WHERE l.feed_id = f.id) AS likeCount,
+    ->     (SELECT COUNT(*) FROM comment c WHERE c.feed_id = f.id AND c.deleted_at IS NULL) AS commentCount,
+    ->     (EXISTS (
+    ->         SELECT 1 FROM feed_likes l
+    ->         WHERE l.feed_id = f.id AND l.user_id = 1
+    ->     )) AS isLiked,
+    ->     f.created_at AS createdAt,
+    ->     f.updated_at AS updatedAt,
+    ->     f.deleted_at AS deletedAt
+    -> FROM feeds f
+    -> JOIN users u ON f.user_id = u.id
+    -> WHERE (0 = 0 OR f.id < 100000) AND f.deleted_at IS NULL
+    -> ORDER BY f.created_at DESC
+    -> LIMIT 10;
++------+--------------------+-------+--------+-------------------------------------+-----------------------------+---------+-------------------+------+--------------------------+
+| id   | select_type        | table | type   | possible_keys                       | key                         | key_len | ref               | rows | Extra                    |
++------+--------------------+-------+--------+-------------------------------------+-----------------------------+---------+-------------------+------+--------------------------+
+|    1 | PRIMARY            | f     | index  | FKa4nmt7wyx9clm9okj61dgd1tw         | idx_feeds_created_deleted   | 18      | NULL              | 10   | Using where              |
+|    1 | PRIMARY            | u     | eq_ref | PRIMARY                             | PRIMARY                     | 8       | testdb.f.user_id  | 1    |                          |
+|    4 | DEPENDENT SUBQUERY | l     | eq_ref | PRIMARY,FK175nyoba7h0i45nliuu1ixoob | FK175nyoba7h0i45nliuu1ixoob | 16      | const,testdb.f.id | 1    | Using index              |
+|    3 | DEPENDENT SUBQUERY | c     | ref    | idx_comment_feed_deleted            | idx_comment_feed_deleted    | 18      | testdb.f.id,const | 1    | Using where; Using index |
+|    2 | DEPENDENT SUBQUERY | l     | ref    | PRIMARY                             | PRIMARY                     | 8       | testdb.f.id       | 1    |                          |
++------+--------------------+-------+--------+-------------------------------------+-----------------------------+---------+-------------------+------+--------------------------+
+5 rows in set (0.017 sec)
+
+MariaDB [testdb]> DROP INDEX idx_feeds_created_deleted ON feeds;
+Query OK, 0 rows affected (0.028 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MariaDB [testdb]> CREATE INDEX idx_feeds_deleted_id_created ON feeds(deleted_at, id, created_at DESC);
+Query OK, 0 rows affected (0.726 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MariaDB [testdb]> MariaDB [testdb]> EXPLAIN
+    ->     -> SELECT
+    ->     ->     f.id AS feedId,
+    ->     ->     u.id AS userId,
+    ->     ->     f.content AS content,
+    ->     ->     f.author AS author,
+    ->     ->     f.feed_type AS feedType,
+    ->     ->     (SELECT COUNT(*) FROM feed_likes l WHERE l.feed_id = f.id) AS likeCount,
+    ->     ->     (SELECT COUNT(*) FROM comment c WHERE c.feed_id = f.id AND c.deleted_at IS NULL) AS commentCount,
+    ->     ->     (EXISTS (
+    ->     ->         SELECT 1 FROM feed_likes l
+    ->     ->         WHERE l.feed_id = f.id AND l.user_id = 1
+    ->     ->     )) AS isLiked,
+    ->     ->     f.created_at AS createdAt,
+    ->     ->     f.updated_at AS updatedAt,
+    ->     ->     f.deleted_at AS deletedAt
+    ->     -> FROM feeds f
+    ->     -> JOIN users u ON f.user_id = u.id
+    ->     -> WHERE (0 = 0 OR f.id < 100000) AND f.deleted_at IS NULL
+    ->     -> ORDER BY f.created_at DESC
+    ->     -> LIMIT 10;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'MariaDB [testdb]> EXPLAIN
+    -> SELECT
+    ->     f.id AS feedId,
+    ->    ...' at line 1
+MariaDB [testdb]> EXPLAIN
+,
+    f.deleted_at AS deletedAt
+FROM feeds f
+JOIN users u ON f.user_id = u.id
+WHERE (0 = 0 OR f.id < 100000) AND f.deleted_at IS NULL
+ORDER BY f.c    -> SELECT
+    ->     f.id AS feedId,
+    ->     u.id AS userId,
+    ->     f.content AS content,
+    ->     f.author AS author,
+    ->     f.feed_type AS feedType,
+    ->     (SELECT COUNT(*) FROM feed_likes l WHERE l.feed_id = f.id) AS likeCount,
+    ->     (SELECT COUNT(*) FROM comment c WHERE c.feed_id = f.id AND c.deleted_at IS NULL) AS commentCount,
+    ->     (EXISTS (
+    ->         SELECT 1 FROM feed_likes l
+    ->         WHERE l.feed_id = f.id AND l.user_id = 1
+    ->     )) AS isLiked,
+    ->     f.created_at AS createdAt,
+    ->     f.updated_at AS updatedAt,
+    ->     f.deleted_at AS deletedAt
+    -> FROM feeds f
+    -> JOIN users u ON f.user_id = u.id
+    -> WHERE (0 = 0 OR f.id < 100000) AND f.deleted_at IS NULL
+    -> ORDER BY f.created_at DESC
+    -> LIMIT 10;
++------+--------------------+-------+--------+----------------------------------------------------------+-----------------------------+---------+-------------------+--------+----------------------------------------------------+
+| id   | select_type        | table | type   | possible_keys                                            | key                         | key_len | ref               | rows   | Extra                                              |
++------+--------------------+-------+--------+----------------------------------------------------------+-----------------------------+---------+-------------------+--------+----------------------------------------------------+
+|    1 | PRIMARY            | f     | range  | FKa4nmt7wyx9clm9okj61dgd1tw,idx_feeds_deleted_id_created | FKa4nmt7wyx9clm9okj61dgd1tw | 9       | NULL              | 994143 | Using index condition; Using where; Using filesort |
+|    1 | PRIMARY            | u     | eq_ref | PRIMARY                                                  | PRIMARY                     | 8       | testdb.f.user_id  | 1      |                                                    |
+|    4 | DEPENDENT SUBQUERY | l     | eq_ref | PRIMARY,FK175nyoba7h0i45nliuu1ixoob                      | FK175nyoba7h0i45nliuu1ixoob | 16      | const,testdb.f.id | 1      | Using index                                        |
+|    3 | DEPENDENT SUBQUERY | c     | ref    | idx_comment_feed_deleted                                 | idx_comment_feed_deleted    | 18      | testdb.f.id,const | 1      | Using where; Using index                           |
+|    2 | DEPENDENT SUBQUERY | l     | ref    | PRIMARY                                                  | PRIMARY                     | 8       | testdb.f.id       | 1      |                                                    |
++------+--------------------+-------+--------+----------------------------------------------------------+-----------------------------+---------+-------------------+--------+----------------------------------------------------+
+5 rows in set (0.017 sec)
+
+MariaDB [testdb]> drop index idx_feeds_deleted_id_created ON feeds;
+Query OK, 0 rows affected (0.023 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MariaDB [testdb]> CREATE INDEX idx_feed_covering ON feeds(deleted_at, created_at DESC, id, user_id, content);
+Query OK, 0 rows affected (0.934 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MariaDB [testdb]> 
+MariaDB [testdb]> EXPLAIN
+RE (0 = 0 OR f.id < 100000) AND f.deleted_at IS NULL
+ORDER BY f.created_at DESC
+LIMIT 10;    -> SELECT
+    ->     f.id AS feedId,
+    ->     u.id AS userId,
+    ->     f.content AS content,
+    ->     f.author AS author,
+    ->     f.feed_type AS feedType,
+    ->     (SELECT COUNT(*) FROM feed_likes l WHERE l.feed_id = f.id) AS likeCount,
+    ->     (SELECT COUNT(*) FROM comment c WHERE c.feed_id = f.id AND c.deleted_at IS NULL) AS commentCount,
+    ->     (EXISTS (
+    ->         SELECT 1 FROM feed_likes l
+    ->         WHERE l.feed_id = f.id AND l.user_id = 1
+    ->     )) AS isLiked,
+    ->     f.created_at AS createdAt,
+    ->     f.updated_at AS updatedAt,
+    ->     f.deleted_at AS deletedAt
+    -> FROM feeds f
+    -> JOIN users u ON f.user_id = u.id
+    -> WHERE (0 = 0 OR f.id < 100000) AND f.deleted_at IS NULL
+    -> ORDER BY f.created_at DESC
+    -> LIMIT 10;
++------+--------------------+-------+--------+-----------------------------------------------+-----------------------------+---------+-------------------+--------+--------------------------+
+| id   | select_type        | table | type   | possible_keys                                 | key                         | key_len | ref               | rows   | Extra                    |
++------+--------------------+-------+--------+-----------------------------------------------+-----------------------------+---------+-------------------+--------+--------------------------+
+|    1 | PRIMARY            | f     | range  | FKa4nmt7wyx9clm9okj61dgd1tw,idx_feed_covering | idx_feed_covering           | 9       | NULL              | 994143 | Using where              |
+|    1 | PRIMARY            | u     | eq_ref | PRIMARY                                       | PRIMARY                     | 8       | testdb.f.user_id  | 1      |                          |
+|    4 | DEPENDENT SUBQUERY | l     | eq_ref | PRIMARY,FK175nyoba7h0i45nliuu1ixoob           | FK175nyoba7h0i45nliuu1ixoob | 16      | const,testdb.f.id | 1      | Using index              |
+|    3 | DEPENDENT SUBQUERY | c     | ref    | idx_comment_feed_deleted                      | idx_comment_feed_deleted    | 18      | testdb.f.id,const | 1      | Using where; Using index |
+|    2 | DEPENDENT SUBQUERY | l     | ref    | PRIMARY                                       | PRIMARY                     | 8       | testdb.f.id       | 1      |                          |
++------+--------------------+-------+--------+-----------------------------------------------+-----------------------------+---------+-------------------+--------+--------------------------+
+5 rows in set (0.016 sec)
+
+MariaDB [testdb]> 
